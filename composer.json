@@ -1,0 +1,64 @@
+{
+    "name": "spatie/laravel-mailcoach-markdown-editor",
+    "description": "A Toast UI Markdown editor package for Mailcoach",
+    "keywords": [
+        "spatie",
+        "laravel-mailcoach-markdown-editor",
+        "toast-ui",
+        "markdown"
+    ],
+    "homepage": "https://github.com/spatie/laravel-mailcoach-markdown-editor",
+    "authors": [
+        {
+            "name": "Rias",
+            "email": "rias@spatie.be",
+            "homepage": "https://spatie.be",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.0",
+        "ext-json": "*",
+        "scrivo/highlight.php": "^v9.18",
+        "spatie/laravel-mailcoach": "^5.2",
+        "spatie/laravel-package-tools": "^1.6"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^7.0",
+        "phpunit/phpunit": "^9.5",
+        "symfony/var-dumper": "^6.0"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://satis.spatie.be"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Spatie\\MailcoachMarkdownEditor\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Spatie\\MailcoachMarkdownEditor\\Tests\\": "tests",
+            "Spatie\\Mailcoach\\Database\\Factories\\": "vendor/spatie/laravel-mailcoach/database/factories"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+              "Spatie\\MailcoachMarkdownEditor\\MailcoachMarkdownEditorServiceProvider"
+            ]
+        }
+    }
+}
