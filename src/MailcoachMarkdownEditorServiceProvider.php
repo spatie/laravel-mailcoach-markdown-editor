@@ -15,7 +15,7 @@ class MailcoachMarkdownEditorServiceProvider extends PackageServiceProvider
             ->hasViews()
             ->hasAssets()
             ->hasConfigFile()
-            ->hasMigration('create_mailcoach_editor_tables');
+            ->hasMigration('create_mailcoach_markdown_editor_tables');
     }
 
     public function bootingPackage()
