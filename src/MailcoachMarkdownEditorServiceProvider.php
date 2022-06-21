@@ -20,7 +20,7 @@ class MailcoachMarkdownEditorServiceProvider extends PackageServiceProvider
 
     public function bootingPackage()
     {
-        Route::macro('mailcoachEditor', function (string $url = '') {
+        Route::macro('mailcoachMarkdownEditor', function (string $url = '') {
             Route::prefix($url)->group(function () {
                 $middlewareClasses = config('mailcoach.middleware.web', []);
 
