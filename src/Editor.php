@@ -13,7 +13,7 @@ class Editor implements AbstractEditor
     {
         $structured_html = json_decode($model->getStructuredHtml(), true);
         $body = $structured_html['body'] ?? '';
-        $template = $structured_html['template'] ?? view('mailcoach-editor::template')->render();
+        $template = $structured_html['template'] ?? view('mailcoach-markdown-editor::template')->render();
 
         return view('mailcoach-markdown-editor::editor', [
             'html' => $model->getHtml(),
@@ -28,7 +28,7 @@ class Editor implements AbstractEditor
     {
         $html = "";
         foreach ($blocks as $block) {
-            $rendererClass = config("mailcoach-editor.renderers.{$block['type']}");
+            $rendererClass = config("mailcoach-markdown-editor.renderers.{$block['type']}");
 
             if ($rendererClass && is_subclass_of($rendererClass, Renderer::class)) {
                 $renderer = new $rendererClass($block['data']);

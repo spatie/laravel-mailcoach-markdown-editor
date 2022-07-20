@@ -19,8 +19,8 @@ class EditorController
             $media = $upload
                 ->addMediaFromRequest('file')
                 ->toMediaCollection(
-                    config('mailcoach-editor.collection_name', 'default'),
-                    config('mailcoach-editor.disk_name'),
+                    config('mailcoach-markdown-editor.collection_name', 'default'),
+                    config('mailcoach-markdown-editor.disk_name'),
                 );
         }
 
@@ -30,8 +30,8 @@ class EditorController
             $media = $upload
                 ->addMediaFromUrl($data['url'])
                 ->toMediaCollection(
-                    config('mailcoach-editor.collection_name', 'default'),
-                    config('mailcoach-editor.disk_name'),
+                    config('mailcoach-markdown-editor.collection_name', 'default'),
+                    config('mailcoach-markdown-editor.disk_name'),
                 );
         }
 
