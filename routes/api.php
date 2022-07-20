@@ -2,5 +2,5 @@
 
 use Spatie\MailcoachMarkdownEditor\Http\Controllers\EditorController;
 
-Route::post('upload', [EditorController::class, 'upload']);
+Route::post('upload', ['\\' . EditorController::class, 'upload']);
 
