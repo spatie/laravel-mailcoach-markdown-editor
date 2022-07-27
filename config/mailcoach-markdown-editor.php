@@ -12,17 +12,4 @@ return [
         'height' => '600px',
         'placeholder' => 'Start writing...',
     ],
-
-    /*
-     * The disk on which to store uploaded images from the editor. Choose
-     * one or more of the disks you've configured in config/filesystems.php.
-     */
-    'disk_name' => env('MEDIA_DISK', 'public'),
-
-    /*
-     * The media collection name to use when storing uploaded images from the editor.
-     * You probably don't need to change this,
-     * unless you're already using spatie/laravel-medialibrary in your project.
-     */
-     'collection_name' => env('MEDIA_COLLECTION', 'default'),
 ];
