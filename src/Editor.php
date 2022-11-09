@@ -2,44 +2,65 @@
 
 namespace Spatie\MailcoachMarkdownEditor;
 
-use Spatie\Mailcoach\Domain\Campaign\Models\Concerns\HasHtmlContent;
-use Spatie\Mailcoach\Domain\Campaign\Models\Template;
-use Spatie\Mailcoach\Domain\Shared\Support\Editor\Editor as AbstractEditor;
-use Spatie\Mailcoach\Domain\TransactionalMail\Models\TransactionalMailTemplate;
+use Illuminate\Contracts\View\View;
+use Spatie\Mailcoach\Domain\Shared\Support\TemplateRenderer;
+use Spatie\Mailcoach\Http\App\Livewire\EditorComponent;
 
-class Editor implements AbstractEditor
+class Editor extends EditorComponent
 {
-    public function render(HasHtmlContent $model): string
+    public static bool $supportsTemplates = false;
+
+    public function render(): View
     {
-        $structured_html = json_decode($model->getStructuredHtml(), true);
-        $body = $structured_html['body'] ?? '';
-        $template = $structured_html['template'] ?? view('mailcoach-markdown-editor::template')->render();
+        if (! $this->templateId) {
+            $template = self::getTemplateClass()::first();
 
-        return view('mailcoach-markdown-editor::editor', [
-            'html' => $model->getHtml(),
-            'body' => $body,
-            'template' => $template,
-            'model' => $model,
-            'showTestButton' => ! $model instanceof Template && ! $model instanceof TransactionalMailTemplate,
-        ])->render();
-    }
-
-    public static function renderBlocks(array $blocks, string $template): string
-    {
-        $html = "";
-        foreach ($blocks as $block) {
-            $rendererClass = config("mailcoach-markdown-editor.renderers.{$block['type']}");
-
-            if ($rendererClass && is_subclass_of($rendererClass, Renderer::class)) {
-                $renderer = new $rendererClass($block['data']);
-                $html .= $renderer->render();
-                $html .= "\n";
-            }
+            $this->templateId = $template?->id;
+            $this->template = $template;
         }
 
-        // Replace this in the generated html as Editor.js likes to automatically add the protocol to links
-        $html = str_replace('http://::', '::', $html);
+        if ($this->template?->containsPlaceHolders()) {
+            foreach ($this->template->placeHolderNames() as $placeHolderName) {
+                if (! is_array($this->templateFieldValues[$placeHolderName] ?? '')) {
+                    $this->templateFieldValues[$placeHolderName] = [
+                        'markdown' => $this->templateFieldValues[$placeHolderName] ?? '',
+                    ];
+                }
 
-        return str_replace('::content::', $html, $template);
+                $this->templateFieldValues[$placeHolderName]['html'] ??= '';
+                $this->templateFieldValues[$placeHolderName]['markdown'] ??= '';
+                $this->templateFieldValues[$placeHolderName]['theme'] ??= 'nord';
+            }
+        } else {
+            if (! is_array($this->templateFieldValues['html'] ?? '')) {
+                $this->templateFieldValues['html'] = [
+                    'markdown' => $this->templateFieldValues['html'] ?? '',
+                ];
+            }
+
+            $this->templateFieldValues['html']['html'] ??= '';
+            $this->templateFieldValues['html']['markdown'] ??= '';
+            $this->templateFieldValues['html']['theme'] ??= 'nord';
+        }
+
+        return view('mailcoach-markdown-editor::editor');
+    }
+
+    public function renderFullHtml()
+    {
+        if (! $this->template) {
+            $this->fullHtml = $this->templateFieldValues['html']['html'] ?? '';
+
+            return;
+        }
+
+        $templateRenderer = (new TemplateRenderer($this->template?->html ?? ''));
+        $this->fullHtml = $templateRenderer->render(collect($this->templateFieldValues)->map(function ($values) {
+            if (is_string($values)) {
+                return $values;
+            }
+
+            return $values['html'] ?? '';
+        })->toArray());
     }
 }
