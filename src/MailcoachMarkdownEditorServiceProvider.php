@@ -2,10 +2,9 @@
 
 namespace Spatie\MailcoachMarkdownEditor;
 
-use Livewire\Livewire;
+use Illuminate\Support\Facades\Route;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Spatie\Mailcoach\Mailcoach;
 
 class MailcoachMarkdownEditorServiceProvider extends PackageServiceProvider
 {
@@ -13,16 +12,20 @@ class MailcoachMarkdownEditorServiceProvider extends PackageServiceProvider
     {
         $package
             ->name('mailcoach-markdown-editor')
-            ->hasRoute('api')
+            ->hasViews()
             ->hasAssets()
-            ->hasViews();
-
-        Livewire::component('mailcoach-markdown-editor::editor', Editor::class);
+            ->hasConfigFile()
+            ->hasMigration('create_mailcoach_markdown_editor_tables');
     }
 
     public function bootingPackage()
     {
-        Mailcoach::editorScript(Editor::class, asset('vendor/mailcoach-markdown-editor/editor.js'));
-        Mailcoach::editorStyle(Editor::class, 'https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css');
+        Route::macro('mailcoachMarkdownEditor', function (string $url = '') {
+            Route::prefix($url)->group(function () {
+                $middlewareClasses = config('mailcoach.middleware.web', []);
+
+                Route::middleware($middlewareClasses)->prefix('')->group(__DIR__ . '/../routes/api.php');
+            });
+        });
     }
 }
