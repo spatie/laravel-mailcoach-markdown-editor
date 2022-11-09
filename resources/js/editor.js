@@ -1,100 +1,78 @@
-import {$, jsonFetch} from './util';
-import {showModal} from './components/modal';
+window.CodeMirror = require('codemirror/lib/codemirror');
 
-document.addEventListener('turbo:load', initEditor);
-document.addEventListener('load', initEditor);
-document.addEventListener('before-visit', confirmBeforeLeaveAndDestroyEditor);
-window.addEventListener('beforeunload', confirmBeforeLeaveAndDestroyEditor);
+require('codemirror/addon/mode/overlay');
+require('codemirror/addon/edit/continuelist');
+require('codemirror/addon/display/placeholder');
+require('codemirror/addon/selection/mark-selection');
+require('codemirror/addon/search/searchcursor');
 
-initEditor();
+require('codemirror/mode/clike/clike');
+require('codemirror/mode/cmake/cmake');
+require('codemirror/mode/css/css');
+require('codemirror/mode/diff/diff');
+require('codemirror/mode/django/django');
+require('codemirror/mode/dockerfile/dockerfile');
+require('codemirror/mode/gfm/gfm');
+require('codemirror/mode/go/go');
+require('codemirror/mode/htmlmixed/htmlmixed');
+require('codemirror/mode/http/http');
+require('codemirror/mode/javascript/javascript');
+require('codemirror/mode/jinja2/jinja2');
+require('codemirror/mode/jsx/jsx');
+require('codemirror/mode/markdown/markdown');
+require('codemirror/mode/nginx/nginx');
+require('codemirror/mode/pascal/pascal');
+require('codemirror/mode/perl/perl');
+require('codemirror/mode/php/php');
+require('codemirror/mode/protobuf/protobuf');
+require('codemirror/mode/python/python');
+require('codemirror/mode/ruby/ruby');
+require('codemirror/mode/rust/rust');
+require('codemirror/mode/sass/sass');
+require('codemirror/mode/shell/shell');
+require('codemirror/mode/sql/sql');
+require('codemirror/mode/stylus/stylus');
+require('codemirror/mode/swift/swift');
+require('codemirror/mode/vue/vue');
+require('codemirror/mode/xml/xml');
+require('codemirror/mode/yaml/yaml');
 
-function confirmBeforeLeaveAndDestroyEditor(event) {
-    if (! document.getElementById('html')) {
+require('./EasyMDE.js');
+
+CodeMirror.commands.tabAndIndentMarkdownList = function (cm) {
+    var ranges = cm.listSelections();
+    var pos = ranges[0].head;
+    var eolState = cm.getStateAfter(pos.line);
+    var inList = eolState.list !== false;
+
+    if (inList) {
+        cm.execCommand('indentMore');
         return;
     }
 
-    if (document.getElementById('html').dataset.dirty === "dirty" && ! confirm('Are you sure you want to leave this page? Any unsaved changes will be lost.')) {
-        event.preventDefault();
+    if (cm.options.indentWithTabs) {
+        cm.execCommand('insertTab');
+    } else {
+        var spaces = Array(cm.options.tabSize + 1).join(' ');
+        cm.replaceSelection(spaces);
+    }
+};
+
+CodeMirror.commands.shiftTabAndUnindentMarkdownList = function (cm) {
+    var ranges = cm.listSelections();
+    var pos = ranges[0].head;
+    var eolState = cm.getStateAfter(pos.line);
+    var inList = eolState.list !== false;
+
+    if (inList) {
+        cm.execCommand('indentLess');
         return;
     }
 
-    document.removeEventListener('turbo:before-visit', confirmBeforeLeaveAndDestroyEditor);
-    window.removeEventListener('beforeunload', confirmBeforeLeaveAndDestroyEditor);
-    window.editor.destroy();
-    window.editor = undefined;
-}
-
-function initEditor() {
-    document.addEventListener('turbo:before-visit', confirmBeforeLeaveAndDestroyEditor);
-    document.addEventListener("turbo:load", initEditor);
-    window.addEventListener('beforeunload', confirmBeforeLeaveAndDestroyEditor);
-
-    const el = $('#markdown-editor');
-    if (! el || window.editor !== undefined) {
-        return;
+    if (cm.options.indentWithTabs) {
+        cm.execCommand('insertTab');
+    } else {
+        var spaces = Array(cm.options.tabSize + 1).join(' ');
+        cm.replaceSelection(spaces);
     }
-
-    const { Editor } = toastui;
-    const { codeSyntaxHighlight, tableMergedCell, colorSyntax } = Editor.plugin;
-
-    const options = JSON.parse(el.dataset.options);
-    window.editor = new Editor({...options,
-        el: el,
-        plugins: [
-            codeSyntaxHighlight,
-            tableMergedCell,
-            colorSyntax,
-        ],
-    });
-    window.editor.setMarkdown(el.dataset.structuredHtml || '');
-
-
-    window.editor.addHook('change', () => {
-        document.getElementById('html').dataset.dirty = "dirty";
-    });
-
-    window.editor.addHook('addImageBlobHook', (blob, callback) => {
-        const data = new FormData();
-        data.append('file', blob);
-
-        jsonFetch(el.dataset.upload, data).then(({ success, file }) => {
-            if (! success) {
-                return;
-            }
-
-            callback(file.url, 'alt text');
-        });
-    });
-
-    function getHTML() {
-        const template = $('#template').value;
-        const html = editor.getHTML().replaceAll("<p><br></p>", '');
-        return template.replace('::content::', html);
-    }
-
-    $('#save').addEventListener('click', (event) => {
-        event.preventDefault();
-
-        document.getElementById('html').value = getHTML();
-        document.getElementById('body').value = editor.getMarkdown();
-        document.getElementById('html').dataset.dirty = "";
-        document.querySelector('main form').submit();
-    });
-
-    $('#preview').addEventListener('click', (event) => {
-        event.preventDefault();
-        $('#html').value = getHTML();
-        const input = document.createEvent('Event');
-        input.initEvent('input', true, true);
-        document.getElementById('html').dispatchEvent(input);
-        showModal('preview');
-    });
-
-    $("[data-modal-trigger=\"edit-template\"]").addEventListener('click', () => {
-        document.getElementById("structured_html[template]").value = $('#template').value;
-    });
-
-    $("[data-modal-confirm=\"edit-template\"]").addEventListener('click', () => {
-        $('#template').value = document.getElementById("structured_html[template]").value;
-    });
-}
+};
