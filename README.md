@@ -2,7 +2,9 @@
 
 This package is an optional add on for [Mailcoach](https://mailcoach.app).
  
-When installed, it adds [EasyMDE](https://easy-markdown-editor.tk), a beautiful markdown editor, to Mailcoach. 
+When installed, it adds [Toast UI Editor](https://ui.toast.com/tui-editor), a beautiful markdown editor, to Mailcoach. 
+
+![screenshot](docs/screenshot.png)
 
 ## Support us
 
