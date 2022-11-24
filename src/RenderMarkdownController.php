@@ -10,9 +10,13 @@ class RenderMarkdownController
     public function __invoke(Request $request, RenderMarkdownToHtmlAction $action): string
     {
         $data = $request->validate([
-            'markdown' => ['required'],
+            'markdown' => ['nullable', 'string'],
             'theme' => ['nullable'],
         ]);
+
+        if (empty($data['markdown'])) {
+            return '';
+        }
 
         return $action->execute($data['markdown'], $data['theme'])->toHtml();
     }
