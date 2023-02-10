@@ -2,7 +2,7 @@
 
 This package is an optional add on for [Mailcoach](https://mailcoach.app).
  
-When installed, it adds [EasyMDE](https://easy-markdown-editor.tk), a beautiful markdown editor, to Mailcoach. 
+When installed, it adds [EasyMDE](https://github.com/Ionaru/easy-markdown-editor), a beautiful markdown editor, to Mailcoach. 
 
 ## Support us
 
