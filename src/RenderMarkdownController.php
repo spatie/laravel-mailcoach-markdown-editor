@@ -18,6 +18,6 @@ class RenderMarkdownController
             return '';
         }
 
-        return $action->execute($data['markdown'], $data['theme'])->toHtml();
+        return $action->execute($data['markdown'], $data['theme'] ?? null)->toHtml();
     }
 }
