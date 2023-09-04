@@ -1,5 +1,13 @@
 <div class="form-grid">
     <style>
+        /* Override the styles set by Filament for EasyMDE */
+        .EasyMDEContainer .editor-toolbar button:before {
+            -webkit-mask-image: none !important;
+            mask-image: none !important;
+            display: none;
+            content: '';
+        }
+
         .cm-s-easymde .cm-header-1 {
             font-size: 1.875rem
         }
@@ -189,17 +197,19 @@
             }
         }
     </script>
-    @if ($model->hasTemplates())
-        <x-mailcoach::template-chooser :clearable="false" />
-    @endif
+    <div>
+        @if ($model->hasTemplates())
+            <x-mailcoach::template-chooser :clearable="false" wire:key="template-chooser" />
+        @endif
+    </div>
 
     @foreach($template?->fields() ?? [['name' => 'html', 'type' => 'editor']] as $field)
         <x-mailcoach::editor-fields :name="$field['name']" :type="$field['type']" :label="$field['name'] === 'html' ? 'Markdown' : null">
             <x-slot name="editor">
                 <div class="markup markup-editor markup-lists markup-links markup-code"
                     wire:ignore x-data="{
-                    html: @entangle('templateFieldValues.' . $field['name'] . '.html'),
-                    markdown: @entangle('templateFieldValues.' . $field['name'] . '.markdown'),
+                    html: @entangle('templateFieldValues.' . $field['name'] . '.html').live,
+                    markdown: @entangle('templateFieldValues.' . $field['name'] . '.markdown').live,
                     theme: @entangle('templateFieldValues.' . $field['name'] . '.theme'),
                     init: init,
                 }">
@@ -254,5 +264,5 @@
         <x-mailcoach::replacer-help-texts :model="$model" />
         <a class="link-dimmed" href="https://www.markdownguide.org/basic-syntax/" target="_blank">Markup syntax</a>
     </div>
-    <x-mailcoach::editor-buttons :preview-html="$fullHtml" :model="$model" />
+    <x-mailcoach::editor-buttons :preview-html="$this->previewHtml" :model="$model" />
 </div>

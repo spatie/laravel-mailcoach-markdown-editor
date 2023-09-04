@@ -3,8 +3,7 @@
 namespace Spatie\MailcoachMarkdownEditor;
 
 use Illuminate\Contracts\View\View;
-use Spatie\Mailcoach\Domain\Shared\Support\TemplateRenderer;
-use Spatie\Mailcoach\Http\App\Livewire\EditorComponent;
+use Spatie\Mailcoach\Livewire\Editor\EditorComponent;
 
 class Editor extends EditorComponent
 {
@@ -54,13 +53,6 @@ class Editor extends EditorComponent
             return;
         }
 
-        $templateRenderer = (new TemplateRenderer($this->template?->html ?? ''));
-        $this->fullHtml = $templateRenderer->render(collect($this->templateFieldValues)->map(function ($values) {
-            if (is_string($values)) {
-                return $values;
-            }
-
-            return $values['html'] ?? '';
-        })->toArray());
+        parent::renderFullHtml();
     }
 }
